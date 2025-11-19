@@ -41,9 +41,9 @@ else
 fi
 
 if "$FORCE_BUILD"; then
-  echo "Recreating and running docker images of Rococo Sample backend..."
+  echo "Recreating and running docker images of TodoMVC backend..."
   docker compose --env-file "${APP_ENV}.env" up -d --build --force-recreate
 else
-  echo "Running docker images of Rococo Sample backend..."
+  echo "Running docker images of TodoMVC backend..."
   docker compose --env-file "${APP_ENV}.env" up -d
 fi
