@@ -2,7 +2,7 @@
     "configurations": [
         {
             "provider": "mailjet",
-            "sourceEmail": "SecondSight <system@secondsight.ai>",
+            "sourceEmail": "TodoMVC <sample_project@ecortest.com>",
             "errorReportingEmail": "asymlabs@gmail.com"
         }
     ],
@@ -11,14 +11,14 @@
             "subject": "Welcome {{var:recipient_name}}",
             "templateName": "Welcome (PROD and TEST)",
             "id": {
-                "mailjet": 4777555
+                "mailjet": 6410451
             }
         },
         "RESET_PASSWORD": {
             "subject": "Reset your password",
             "templateName": "Reset Password (PROD and TEST)",
             "id": {
-                "mailjet": 4781139
+                "mailjet": 6410454
             }
         }
     }

@@ -263,7 +263,7 @@ class AuthService:
         if not person:
             raise APIException("Person does not exist.")
 
-        login_method = self.login_method_service.get_login_method_by_email_id(email.entity_id)
+        login_method = self.login_method_service.get_login_method_by_email_id(email_obj.entity_id)
         if not login_method:
             raise APIException("Login method does not exist.")
 
