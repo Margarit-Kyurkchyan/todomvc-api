@@ -62,6 +62,7 @@ class RepoType(Enum):
     EMAIL = auto()
     LOGIN_METHOD = auto()
     PERSON_ORGANIZATION_ROLE = auto()
+    TASK = auto()
 
 
 class RepositoryFactory:
@@ -74,7 +75,8 @@ class RepositoryFactory:
         RepoType.ORGANIZATION: OrganizationRepository,
         RepoType.EMAIL: EmailRepository,
         RepoType.LOGIN_METHOD: LoginMethodRepository,
-        RepoType.PERSON_ORGANIZATION_ROLE: PersonOrganizationRoleRepository
+        RepoType.PERSON_ORGANIZATION_ROLE: PersonOrganizationRoleRepository,
+        RepoType.TASK: TaskRepository
     }
 
     def get_db_connection(self):
