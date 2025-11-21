@@ -18,21 +18,38 @@ cd todomvc-api
 
 ### 2. Set Up Environment Files
 
-Create a `.env.secrets` file in the root directory with the following content:
+Copy the environment files from the example/template files:
 
 ```bash
-APP_ENV=local
+# Copy environment configuration
+cp local.env .env
+
+# Copy secrets template (if .env.secrets.example exists)
+cp .env.secrets.example .env.secrets
 ```
 
-**Note:** Replace any actual secret values (passwords, API keys, etc.) with placeholders. See `.env.secrets.example` if available for the required format.
+**Important:** After copying `.env.secrets.example` to `.env.secrets`, you need to:
+- Set `APP_ENV=local` (or your desired environment)
+- Replace any placeholder values with actual secrets (passwords, API keys, etc.)
+- Never commit `.env.secrets` to version control
 
 ### 3. Configure Environment Variables
 
-The project uses `local.env` for environment-specific variables. Make sure this file exists and contains the necessary configuration. The default `local.env` file should already be present in the repository.
+The `.env` file (copied from `local.env`) contains environment-specific variables. The default `local.env` file should already be present in the repository with the necessary configuration.
 
-### 4. Run the Backend
+### 4. Build and Run the Backend
 
-Use the provided `run.sh` script to start all services:
+After setting up the environment files, build and start the Docker containers:
+
+```bash
+# Build Docker images
+docker-compose build
+
+# Start all services
+docker-compose up
+```
+
+**Alternative:** You can also use the provided `run.sh` script:
 
 ```bash
 # Start the backend (uses existing Docker images)
