@@ -18,7 +18,7 @@ class TaskService:
         return task
 
     def get_tasks_by_person_id(self, person_id: str):
-        tasks = self.task_repo.get_many({"person_id": person_id, "active": True})
+        tasks = self.task_repo.get_tasks_by_person_id_ordered(person_id)
         return tasks
 
     def delete_task(self, task: Task):
