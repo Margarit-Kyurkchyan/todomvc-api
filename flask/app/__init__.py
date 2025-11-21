@@ -35,7 +35,12 @@ def create_app():
 
     # Register views
     from app.views import initialize_views
-    initialize_views(api)
+    
+    # Always initialize views - Flask-RESTX handles duplicate namespace registration gracefully
+    # The check prevents errors when create_app() is called multiple times (e.g., in tests)
+    # We check if we have all expected namespaces (auth, organization, person = 3)
+    if len(api.namespaces) < 3:
+        initialize_views(api)
 
     api.init_app(app)
 
