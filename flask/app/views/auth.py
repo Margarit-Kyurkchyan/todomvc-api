@@ -1,4 +1,4 @@
-from flask_restx import Namespace, Resource
+from flask_restx import Namespace, Resource, Model, fields
 from flask import request
 from app.helpers.response import get_success_response, get_failure_response, parse_request_body, validate_required_fields
 from app.helpers.decorators import login_required
@@ -7,6 +7,32 @@ from common.services import AuthService, PersonService, OAuthClient
 
 # Create the auth blueprint
 auth_api = Namespace('auth', description="Auth related APIs")
+
+# Define request models
+signup_model = Model('Signup', {
+    'first_name': fields.String(description='First name of the user', required=True),
+    'last_name': fields.String(description='Last name of the user', required=True),
+    'email_address': fields.String(description='Email address of the user', required=True)
+})
+
+login_model = Model('Login', {
+    'email': fields.String(description='Email address of the user', required=True),
+    'password': fields.String(description='Password of the user', required=True)
+})
+
+forgot_password_model = Model('ForgotPassword', {
+    'email': fields.String(description='Email address of the user requesting password reset', required=True)
+})
+
+reset_password_model = Model('ResetPassword', {
+    'password': fields.String(description='New password for the user', required=True)
+})
+
+# Register models
+auth_api.models[signup_model.name] = signup_model
+auth_api.models[login_model.name] = login_model
+auth_api.models[forgot_password_model.name] = forgot_password_model
+auth_api.models[reset_password_model.name] = reset_password_model
 
 
 @auth_api.route('/test')
@@ -21,14 +47,22 @@ class Test(Resource):
 
 @auth_api.route('/signup')
 class Signup(Resource):
-    @auth_api.expect(
-        {'type': 'object', 'properties': {
-            'first_name': {'type': 'string'},
-            'last_name': {'type': 'string'},
-            'email_address': {'type': 'string'}
-        }}
-    )
+    @auth_api.expect(signup_model)
     def post(self):
+        """
+        Register a new user account and send an onboarding email.
+
+        Request Body:
+            first_name (str): User's first name.
+            last_name (str): User's last name.
+            email_address (str): Unique email address for the account; must be a valid email.
+
+        Returns:
+            dict: Confirmation message indicating that the sign-up flow started successfully.
+
+        Raises:
+            InputValidationError: Raised when a required field is missing or empty.
+        """
         parsed_body = parse_request_body(request, ['first_name', 'last_name', 'email_address'])
         validate_required_fields(parsed_body)
 
@@ -44,13 +78,22 @@ class Signup(Resource):
 
 @auth_api.route('/login')
 class Login(Resource):
-    @auth_api.expect(
-        {'type': 'object', 'properties': {
-            'email': {'type': 'string'},
-            'password': {'type': 'string'}
-        }}
-    )
+    @auth_api.expect(login_model)
     def post(self):
+        """
+        Validate user credentials and issue an access token.
+
+        Request Body:
+            email (str): Email address of the registered user.
+            password (str): Plain-text password corresponding to the email.
+
+        Returns:
+            dict: Success response that contains serialized person data, an access token and its expiry.
+
+        Raises:
+            InputValidationError: Raised when the payload is missing required keys or when credentials are invalid.
+            APIException: Propagated for service-level failures.
+        """
         parsed_body = parse_request_body(request, ['email', 'password'])
         validate_required_fields(parsed_body)
 
@@ -68,12 +111,21 @@ class Login(Resource):
 
 @auth_api.route('/forgot_password', doc=dict(description="Send reset password link"))
 class ForgotPassword(Resource):
-    @auth_api.expect(
-        {'type': 'object', 'properties': {
-            'email': {'type': 'string'}
-        }}
-    )
+    @auth_api.expect(forgot_password_model)
     def post(self):
+        """
+        Trigger delivery of a password reset link to a registered email address.
+
+        Request Body:
+            email (str): Email address tied to the account that needs a reset link.
+
+        Returns:
+            dict: Confirmation that the reset email was queued for delivery.
+
+        Raises:
+            InputValidationError: Raised when the email field is missing or blank.
+            APIException: Raised when the supplied email is not registered or when dependent services fail.
+        """
         parsed_body = parse_request_body(request, ['email'])
         validate_required_fields(parsed_body)
 
@@ -88,11 +140,7 @@ class ForgotPassword(Resource):
     doc=dict(description="Update the password using reset password link")
 )
 class ResetPassword(Resource):
-    @auth_api.expect(
-        {'type': 'object', 'properties': {
-            'password': {'type': 'string'}
-        }}
-    )
+    @auth_api.expect(reset_password_model)
     def post(self, token, uidb64):
         parsed_body = parse_request_body(request, ['password'])
         validate_required_fields(parsed_body)
